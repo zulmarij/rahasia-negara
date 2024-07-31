@@ -1,4 +1,4 @@
-const { User, Role } = require('@prisma/client');
+const { User, UserRole } = require('@prisma/client');
 const httpStatus = require('http-status');
 const prisma = require('../client');
 const ApiError = require('../utils/ApiError');
@@ -9,7 +9,7 @@ const { encryptPassword } = require('../utils/encryption');
  * @param {Object} userBody
  * @returns {Promise<User>}
  */
-const createUser = async (email, password, name, role = Role.USER) => {
+const createUser = async (email, password, name, role = UserRole.USER) => {
   if (await getUserByEmail(email)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }

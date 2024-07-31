@@ -62,4 +62,10 @@ app.use(errorConverter);
 // handle error
 app.use(errorHandler);
 
+// fix 'how serialize a BigInt'
+BigInt.prototype.toJSON = function () {
+  const int = Number.parseInt(this.toString());
+  return int ?? this.toString();
+};
+
 module.exports = app;

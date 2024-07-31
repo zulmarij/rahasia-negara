@@ -1,4 +1,4 @@
-const { Role } = require('@prisma/client');
+const { UserRole } = require('@prisma/client');
 const Joi = require('joi');
 const { password } = require('./custom.validation');
 
@@ -7,7 +7,7 @@ const createUser = {
     email: Joi.string().required().email(),
     password: Joi.string().required().custom(password),
     name: Joi.string().required(),
-    role: Joi.string().required().valid(Role.USER, Role.ADMIN)
+    role: Joi.string().required().valid(UserRole.USER, UserRole.ADMIN)
   })
 };
 

@@ -1,8 +1,8 @@
-const { Role } = require('@prisma/client');
+const { UserRole } = require('@prisma/client');
 
 const allRoles = {
-  [Role.USER]: [],
-  [Role.ADMIN]: ['getUsers', 'manageUsers']
+  [UserRole.USER]: [],
+  [UserRole.ADMIN]: ['getUsers', 'manageUsers']
 };
 
 const roles = Object.keys(allRoles);
