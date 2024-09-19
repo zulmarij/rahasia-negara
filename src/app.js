@@ -1,24 +1,17 @@
-const express = require('express');
-const helmet = require('helmet');
 const compression = require('compression');
 const cors = require('cors');
-const passport = require('passport');
+const express = require('express');
+const helmet = require('helmet');
 const httpStatus = require('http-status');
-const config = require('./config/config');
-const morgan = require('./config/morgan');
-const xss = require('./middlewares/xss');
-const { jwtStrategy } = require('./config/passport');
-const { authLimiter } = require('./middlewares/rateLimiter');
-const routes = require('./routes/v1');
-const { errorConverter, errorHandler } = require('./middlewares/error');
-const ApiError = require('./utils/ApiError');
+const passport = require('passport');
+const { morganConfig, passportConfig } = require('./config');
+const routes = require('./routes');
+const { errorMiddleware, xssMiddleware } = require('./middlewares');
 
 const app = express();
 
-if (config.env !== 'test') {
-  app.use(morgan.successHandler);
-  app.use(morgan.errorHandler);
-}
+app.use(morganConfig.successHandler);
+app.use(morganConfig.errorHandler);
 
 // set security HTTP headers
 app.use(helmet());
@@ -30,7 +23,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // sanitize request data
-app.use(xss());
+app.use(xssMiddleware());
 
 // gzip compression
 app.use(compression());
@@ -41,26 +34,28 @@ app.options('*', cors());
 
 // jwt authentication
 app.use(passport.initialize());
-passport.use('jwt', jwtStrategy);
+passport.use('jwt', passportConfig.jwtStrategy);
 
 // limit repeated failed requests to auth endpoints
-if (config.env === 'production') {
-  app.use('/v1/auth', authLimiter);
-}
+// if (envConfig.env === 'production') {
+//   app.use('/v1/auth', authLimiterMiddleware);
+// }
 
-// v1 api routes
-app.use('/v1', routes);
+app.use('/', express.static('public'));
 
-// send back a 404 error for any unknown api request
+// routes
+app.use(routes);
+
+// send back a 404 error for any unknown request
 app.use((req, res, next) => {
-  next(new ApiError(httpStatus.NOT_FOUND, 'Not found'));
+  next(new apiError(httpStatus.NOT_FOUND, 'Not found'));
 });
 
 // convert error to ApiError, if needed
-app.use(errorConverter);
+app.use(errorMiddleware.errorConverter);
 
 // handle error
-app.use(errorHandler);
+app.use(errorMiddleware.errorHandler);
 
 // fix 'how serialize a BigInt'
 BigInt.prototype.toJSON = function () {

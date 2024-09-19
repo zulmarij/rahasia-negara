@@ -10,3 +10,6 @@ yarn-error.log
 
 # misc
 .DS_Store
+
+#logging
+logs

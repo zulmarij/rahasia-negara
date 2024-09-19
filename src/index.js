@@ -1,20 +1,19 @@
+const { prisma } = require('./prisma');
 const app = require('./app');
-const prisma = require('./client');
-const config = require('./config/config');
-const logger = require('./config/logger');
+const { envConfig, loggerConfig } = require('./config');
 
 let server;
 prisma.$connect().then(() => {
-  logger.info('Connected to SQL Database');
-  server = app.listen(config.port, () => {
-    logger.info(`Listening to port ${config.port}`);
+  loggerConfig.info('Connected to SQL Database');
+  server = app.listen(envConfig.port, () => {
+    loggerConfig.info(`Server (${envConfig.env}) running on port ${envConfig.port}`);
   });
 });
 
 const exitHandler = () => {
   if (server) {
     server.close(() => {
-      logger.info('Server closed');
+      loggerConfig.info('Server closed');
       process.exit(1);
     });
   } else {
@@ -23,7 +22,7 @@ const exitHandler = () => {
 };
 
 const unexpectedErrorHandler = (error) => {
-  logger.error(error);
+  loggerConfig.error(error);
   exitHandler();
 };
 
@@ -31,7 +30,14 @@ process.on('uncaughtException', unexpectedErrorHandler);
 process.on('unhandledRejection', unexpectedErrorHandler);
 
 process.on('SIGTERM', () => {
-  logger.info('SIGTERM received');
+  loggerConfig.info('SIGTERM signal received');
+  if (server) {
+    server.close();
+  }
+});
+
+process.on('SIGINT', () => {
+  loggerConfig.info('SIGTERM signal received');
   if (server) {
     server.close();
   }

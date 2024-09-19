@@ -1,5 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
-const { envConfig } = require('./config');
+const { envConfig } = require('../config');
+
+global.prisma;
 
 const prisma = global.prisma || new PrismaClient();
 

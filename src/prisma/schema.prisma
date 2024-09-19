@@ -1,0 +1,16 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Example {
+  id         BigInt  @id(map: "idx_51125_primary") @default(autoincrement())
+  name       String  @db.VarChar(255)
+  created_at BigInt  @default(dbgenerated("date_part('epoch'::text, now())"))
+  updated_at BigInt  @default(dbgenerated("date_part('epoch'::text, now())"))
+  deleted_at BigInt?
+}

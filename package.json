@@ -6,12 +6,17 @@
   "main": "src/index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "pm2 start ecosystem.config.json --no-daemon",
+    "start": "cross-env NODE_ENV=production node src/index.js",
     "dev": "cross-env NODE_ENV=development nodemon src/index.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "prettier": "prettier --check **/*.js",
-    "prettier:fix": "prettier --write **/*.js",
+    "prettier": "prettier --check **/*",
+    "prettier:fix": "prettier --write **/*",
+    "db:pull": "prisma db pull --schema=src/prisma/schema.prisma",
+    "db:studio": "prisma studio --schema=src/prisma/schema.prisma",
+    "db:generate": "prisma generate --schema=src/prisma/schema.prisma",
+    "db:validate": "prisma validate --schema=src/prisma/schema.prisma",
+    "db:format": "prisma format --schema=src/prisma/schema.prisma",
     "prepare": "husky"
   },
   "dependencies": {
@@ -32,6 +37,7 @@
     "passport-jwt": "^4.0.1",
     "pm2": "^5.4.2",
     "winston": "^3.13.1",
+    "winston-daily-rotate-file": "^5.0.0",
     "xss-filters": "^1.2.7"
   },
   "devDependencies": {
